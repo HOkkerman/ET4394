@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<ArrayOfMemoryEntry xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <MemoryEntry>
+    <IsFavourite>true</IsFavourite>
+    <Name>93.400 MHz WFM</Name>
+    <GroupName>Grooves</GroupName>
+    <Frequency>93400000</Frequency>
+    <DetectorType>WFM</DetectorType>
+    <Shift>0</Shift>
+    <FilterBandwidth>129960</FilterBandwidth>
+  </MemoryEntry>
+</ArrayOfMemoryEntry>
