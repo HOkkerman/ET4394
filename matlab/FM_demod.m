@@ -49,4 +49,15 @@ z_N2=downsample(z_B2,N2);
 fs_2=fs_1/N2;
 
 %simpleSA(z_B2, 2^14,fs_1/1000);
-soundsc(z_N2, fs_2);
+%soundsc(z_N2, fs_2);
+
+%De-emphasis filter
+%Emphasis time constant Europe
+tau=50*10^-6;
+%Feedback coefficient
+a1=exp(-1/(tau*fs_2));
+%Filters
+a=[1,-a1];
+b=[1-a1];
+z_out=filter(b,a,z_N2);
+
