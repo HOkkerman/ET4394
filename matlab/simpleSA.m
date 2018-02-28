@@ -46,6 +46,6 @@ if nargin >= 5
     axis([F(1) F(end) min_dB max_dB]);
 end
 
-xlabel('Frequency (kHz)')
+xlabel('Frequency (Hz)')
 ylabel('Power Spectrum in dB')
 grid on

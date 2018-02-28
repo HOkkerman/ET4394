@@ -1,4 +1,23 @@
 function [z_out, z_B2, z_N2, z_dis, y_N1, y_B1]=FM_demod(x, B1, N1, B2, N2, fs)
+%Simple FM demodulator for pre-recorded rf data centered at station of
+%interest.
+%Outputs:
+%z_out is final demodulated audio
+%z_B2  is signal after second LPF
+%z_N2  is signal after second decimation
+%z_dis is signal after discriminator
+%y_N1  is signal after first decimation
+%y_B1  is signal after first LPF
+%Inputs:
+%x     is prerecorded data
+%B1    is cutoff frequency for first LPF
+%N1    is factor for first decimator
+%B2    is cutoff frequency for second LPF
+%N2    is factor for second decimator
+%fs    is sample frequency of input data
+%
+% Example input for assignment: FM_demod(x,80000, 10, 16000, 5, 2400000);
+
 %Lowpass filter 1------------------------------------------------------
 %Butter
 order=6;
@@ -54,4 +73,5 @@ z_out=filter(b,a,z_N2);
 
 
 %soundsc(z_N2, fs_2);
+%simpleSA(z_out,2^14,fs_2);
 
