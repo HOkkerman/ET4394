@@ -18,12 +18,13 @@ then
     #Get first WiFi interface
     interface="$(iwconfig | awk '$3 ~ "802.11" {print $1; exit;}')"
     output="capturedData/captures"
+    echo "Using default parameters. Use './startSniffing.sh <WiFiInterface> <output_file> for user specific parameters."
 else
     interface=$1
     output=$2
 fi
 
-echo "Starting capture on ${interface}."
+echo "Starting capture on $interface and directing outputs to $output."
 
 # Dump wifi sniffing data from all channels into $output in csv format
 sudo airodump-ng -b abg -e --write $output --output-format csv $interface
