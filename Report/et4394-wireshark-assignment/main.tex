@@ -1,0 +1,130 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%2345678901234567890123456789012345678901234567890123456789012345678901234567890
+%        1         2         3         4         5         6         7         8
+
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf}  % Comment this line out
+                                                          % if you need a4paper
+%\documentclass[a4paper, 10pt, conference]{ieeeconf}      % Use this line for a4
+                                                          % paper
+
+\IEEEoverridecommandlockouts                              % This command is only
+                                                          % needed if you want to
+                                                          % use the \thanks command
+\overrideIEEEmargins
+% See the \addtolength command later in the file to balance the column lengths
+% on the last page of the document
+
+
+
+% The following packages can be found on http:\\www.ctan.org
+%\usepackage{graphics} % for pdf, bitmapped graphics files
+%\usepackage{epsfig} % for postscript graphics files
+%\usepackage{mathptmx} % assumes new font selection scheme installed
+%\usepackage{times} % assumes new font selection scheme installed
+%\usepackage{amsmath} % assumes amsmath package installed
+%\usepackage{amssymb}  % assumes amsmath package installed
+
+\title{\LARGE \bf
+ET4394 Wireshark assignment W11
+}
+
+%\author{ \parbox{3 in}{\centering Huibert Kwakernaak*
+%         \thanks{*Use the $\backslash$thanks command to put information here}\\
+%         Faculty of Electrical Engineering, Mathematics and Computer Science\\
+%         University of Twente\\
+%         7500 AE Enschede, The Netherlands\\
+%         {\tt\small h.kwakernaak@autsubmit.com}}
+%         \hspace*{ 0.5 in}
+%         \parbox{3 in}{ \centering Pradeep Misra**
+%         \thanks{**The footnote marks may be inserted manually}\\
+%        Department of Electrical Engineering \\
+%         Wright State University\\
+%         Dayton, OH 45435, USA\\
+%         {\tt\small pmisra@cs.wright.edu}}
+%}
+
+\author{Pradhayini Ramamurthy (xxxxxxx) and Hans Okkerman (4290453)% <-this % stops a space
+}
+
+
+\begin{document}
+
+
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+
+///
+
+\end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+For the Wireless Networking course of Delft University of Technology an analysis had to be done on WiFi networks. This report covers assignment $W11$ which concerns extracting the used security types per access point. To extract the required information dedicated software such as Wireshark is used. 
+
+The rest of this report is built up as follows: First the used software, hardware and data collection process are discussed. Next, the results of filtering the recorded data are shown. Finally it is concluded that ????. The measurements are provided in Appendix ????.
+
+
+
+
+
+
+
+\section{Data collection}
+The used hardware during this assignment was a (INSERT LAPTOP TYPE HERE) laptop running Ubuntu (? VERSION) and containing a (TYPE) wireless card. Wireshark was used in monitoring mode while moving by public transport through different areas to collect data from as many access points as possible. The resulting recordings are given in Appendix (???)
+
+The data of interest for the security of the wireless networks are given in the columns of $privacy$, $cipher$ and $authentication$. $Privacy$ contains the security protocol used by the network. These can be open or not encrypted, WEP which is an older standard that is no longer considered secure, WPA which replaced WEP and WPA2 which replaces WPA and is currently the most secure. $Cipher$ contains the used encryption protocol of the network. These are either none for open networks, $WEP$, $TKIP$ or $CCMP$. $TKIP$ is used by the WPA protocol and has been considered deprecated since 2009. $CCMP$ is the default encryption scheme for $WPA2$ which replaces $TKIP$, however it is possible to provide $TKIP$ on $WPA2$ to support older devices. Finally $authentication$ contains the means of authentication to the network. This can be either none for open networks, $PSK$ for regular networks where a password is required to connect and $MGT$ for corporate or other more secure networks. These require a so called $RADIUS$ server which a user has to log on to and provide more information before he can connect to the network.
+
+
+Short discussion about used software? Wireshark, aircrack-ng, kismet... Not sure if necessary though.\\
+Used hardware? Wifi card specs?\\
+Measurement locations, used commands/filters etc\\
+Refer to appendix with measurements\\
+
+
+   
+\section{Results}
+
+
+
+
+
+\section{Conclusion}
+
+
+\addtolength{\textheight}{-12cm}   % This command serves to balance the column lengths
+                                  % on the last page of the document manually. It shortens
+                                  % the textheight of the last page by a suitable amount.
+                                  % This command does not take effect until the next page
+                                  % so it should come on the page before the last. Make
+                                  % sure that you do not shorten the textheight too much.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{APPENDIX}
+
+
+
+
+
+%\begin{thebibliography}{99}
+%\bibitem{c1} G. O. Young, ÒSynthetic structure of industrial plastics (Book style with paper title and editor),Ó 	in Plastics, 2nd ed. vol. 3, J. Peters, Ed.  New York: McGraw-Hill, 1964, pp. 15Ð64.
+%\end{thebibliography}
+
+
+
+
+\end{document}
