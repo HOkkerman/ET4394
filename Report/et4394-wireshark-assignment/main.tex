@@ -93,7 +93,7 @@ This report details the procedure, results and analysis of the Wireshark assignm
 \section{Introduction}
 For the Wireless Networking course of Delft University of Technology an analysis had to be done on WiFi networks. This report covers assignment $W11$ which concerns extracting the used security types per access point. To extract the required information dedicated software such as Wireshark and airodump-ng are used on a laptop which is carried through several areas to record data from nearby networks. 
 
-The rest of this report is built up as follows: First the used software, hardware and data collection process are discussed. Next, the results of filtering the recorded data are shown. Finally conclusions are drawn about the used security of the networks. The measurements are provided in the Appendix, in Table \ref{tab:measurements}.
+The rest of this report is built up as follows: First the used software, hardware and data collection process are discussed. Next, the results of filtering the recorded data are shown. Finally conclusions are drawn about the used security of the networks. 
 
 
 
@@ -120,7 +120,7 @@ sudo airodump-ng -b abg -e --write $output --output-format csv $interface
 The data of interest for the security analysis of the wireless networks are given in the columns of $privacy$, $cipher$ and $authentication$ in the captured data dump. $Privacy$ contains the security protocol used by the network. These can be open or not encrypted, WEP which is an older standard that is no longer considered secure, WPA which replaced WEP and WPA2 which replaces WPA and is currently the most secure. $Cipher$ contains the used encryption protocol of the network. These are either none for open networks, $WEP$, $TKIP$ or $CCMP$. $TKIP$ is used by the WPA protocol and has been considered deprecated since 2009. $CCMP$ is the default encryption scheme for $WPA2$ which replaces $TKIP$, however it is possible to provide $TKIP$ on $WPA2$ to support older devices. Finally $authentication$ contains the means of client authentication to the network. This can be either none for open networks, $PSK$ for regular networks where a password is required to connect and $MGT$ for corporate or other more secure networks. These require a so called $RADIUS$ server which a user has to log on to and provide more information before he can connect to the network.
  
 \section{Results}
-From the recorded data several distribution profiles can be made based on security protocols, encryption types and authentication types. These will be discussed in the following sections.
+From the recorded data several distribution profiles can be made based on security protocols, encryption types and authentication types. These will be discussed in the following sections. The measurements are provided in Table \ref{tab:measurements}.
 
 \subsection{Security protocols}
 Data was first collected while driving by bus through Eindhoven. The distribution of detected network security protocols can be seen in Figure \ref{fig:busencdist}. From the Figure it is clear that most detected networks support $WPA2$ or both $WPA2$ and $WPA$ and very few only support $WPA$ or even $WEP$. A rather large amount of open networks was also detected. From the corresponding $ESSID$s it can be shown that a large amount of these networks belong to KPN's $Fon$ network which enables an unencrypted, open AP on the routers of KPN's customers (SSID $KPN Fon$) by default. This (from personal experience) is something that a majority of users are unaware of and keep enabled, as seen by the $41$ or so such APs. The remaining open networks are mostly "free WiFi" hotspots in stores or cafeterias. 
@@ -194,9 +194,8 @@ $WPA$ and $WPA2$ support two different client authentication methods, $PSK$ and 
 \section{Conclusion}
 From the graphs in the previous sections it can be seen that the trends in both populated urban areas and in the sparse rural areas are nearly identical, and only differ in the actual number of Access Points. Open unencrypted networks that do not require any user authentication are mostly provided by KPN's $Fon$ network, public transport companies such as NS with $Wifi in de trein$ and Arriva's $ArrivaHotspot$, city centers ($EHV FREE WIFI$) and shopping centers. Most other personal or office-owned APs are running $WPA2$ or both $WPA$ and $WPA2$, and most of those use either only $CCMP$ or both $CCMP$ and $TKIP$. Authentication is most commonly done using $PSK$ with some corporations using $MGT$. Very few networks still only rely on older insecure standards such as $WEP$ or $WPA$ only, which is a good sign for the overall security of wireless networks.
 
-\section{Appendix}
 \begin{center}
-  \begin{table*} [htbp]
+  \begin{table*}
    \centering
     \begin{tabular}{ |l|l|l|l|l|l|l|l|l|l|l|l|l| }
     \hline    
@@ -208,7 +207,7 @@ From the graphs in the previous sections it can be seen that the trends in both 
     WEP & 5 & 9 & - & - & - & - & - & - & - & - & - & - \\ \hline    
     WPA & 29 & 13 & 10 & 3 & 1 & 3 & 4 & 2 & 15 & 8 & 0 & 0 \\ \hline
     WPA2 & 1024 & 436 & 6 & 0 & 800 & 330 & 218 & 106 & 916 & 385 & 108 & 51 \\ \hline
-    WPA2WPA & 255 & 94 & 2 & 0 & 36 & 27 & 217 & 67 & 235 & 90 & 20 & 4 \\ \hline
+    WPA2WPA & 255 & 94 & 2 & 0 & 36 & 27 & 217 & 67 & 235 & 90 & 20 & 4 \\ \hline    
     \end{tabular}
     \caption{Distribution of number of occurrences of protocols in airodump-ng measurements}
     \label{tab:measurements}
