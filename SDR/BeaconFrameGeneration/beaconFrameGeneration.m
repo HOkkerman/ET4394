@@ -2,6 +2,7 @@ function [] = beaconFrameGeneration()
 % SDR setup
 useSDR = false;
 saveToFile = true;
+bbFileName = 'nonHTBeaconPacket.bb';
 
 % Create beacon frame
 SSID = 'TEST_BEACON'; % Network SSID
@@ -24,9 +25,21 @@ Rs = wlanSampleRate(cfgNonHT);           % Get the input sampling rate
 % Save waveform to file
 if saveToFile
     % The waveform is stored in a baseband file
-    BBW = comm.BasebandFileWriter('nonHTBeaconPacket.bb', Rs, fc); %#ok<UNRCH>
+    BBW = comm.BasebandFileWriter(bbFileName, Rs, fc); %#ok<UNRCH>
     BBW(txWaveform);
     release(BBW);
+end
+
+% Display waveform data from file
+if saveToFile
+    bbr = comm.BasebandFileReader(bbFileName);
+    sampleRate = bbr.SampleRate
+    centerFrequency = bbr.CenterFrequency
+    numChannels = bbr.NumChannels
+    metadata = bbr.Metadata
+    samplesPerFrame = bbr.SamplesPerFrame
+    cyclicRepetition = bbr.CyclicRepetition
+    release(bbr);
 end
 
 % Configure transmission
