@@ -1,4 +1,7 @@
-function ratecontrol(bandwidth, delay_profile, distance)
+function [movDataRate]=ratecontrol(bandwidth, delay_profile, distance)
+bandwidth
+delay_profile
+distance
 
 %% Inputs
 cfgVHT = wlanVHTConfig;         

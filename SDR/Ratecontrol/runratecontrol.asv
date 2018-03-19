@@ -10,10 +10,32 @@
 %editing and changing algorithms
 
 %Bandwidth of channel. Can be CBW20, CBW40, CBW80 or CBW160
-bandwidth='CBW20';
+bandwidth_i=['CBW20 '; 'CBW40 '; 'CBW80 '; 'CBW160'];
+bandwidth=cellstr(bandwidth_i);
+
 %Delay profile model. Can be Model-A through Model-F. Higher is more
 %reflections and larger delays
-delay_profile='Model-A';
-%Distance is the distance between Tx and 
+delay_profile_i=['Model-A'; 'Model-B'; 'Model-C'; 'Model-D'; 'Model-E'; 'Model-F' ];
+delay_profile=cellstr(delay_profile_i);
+%Distance is the distance between Tx and Rx. Determines if there is a LOS
+%condition based on the chosen delay profile.
 distance=3;
+avg_datarate=zeros(length(bandwidth), length(delay_profile));
+
+for bw=1:length(bandwidth)
+    for dp=1:length(delay_profile)
+        bandwidth_in=bandwidth(bw);
+        delay_profile_in=delay_profile(dp);
+        distance_in=distance;
+        
+        mov = ratecontrol(bandwidth_in, delay_profile_in, distance_in);
+        avg_datarate(bw,dp)=mean(mov);
+    end
+
+
+end
+        
+
+mov = ratecontrol(bandwidth_in, delay_profile_in, distance_in);
+avg_datarate=mean(mov);
 
