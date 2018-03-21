@@ -20,6 +20,12 @@ delay_profile=cellstr(delay_profile_i);
 %Distance is the distance between Tx and Rx. Determines if there is a LOS
 %condition based on the chosen delay profile.
 distance=3;
+
+%Amount of Tx and Rx antennas:
+ntx=1;
+nrx=1;
+
+
 avg_datarate=zeros(length(bandwidth), length(delay_profile));
 
 for bw=1:length(bandwidth)
@@ -28,7 +34,7 @@ for bw=1:length(bandwidth)
         delay_profile_in=char(delay_profile(dp));
         distance_in=distance;
         
-        mov = ratecontrol(bandwidth_in, delay_profile_in, distance_in);
+        [avg, mov] = ratecontrol(bandwidth_in, delay_profile_in, distance_in, ntx, nrx);
         avg_datarate(bw,dp)=mean(mov);
     end
 
@@ -36,6 +42,6 @@ for bw=1:length(bandwidth)
 end
         
 
-mov = ratecontrol(bandwidth_in, delay_profile_in, distance_in);
-avg_datarate=mean(mov);
+% mov = ratecontrol(bandwidth_in, delay_profile_in, distance_in);
+% avg_datarate=mean(mov);
 

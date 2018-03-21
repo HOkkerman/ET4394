@@ -1,7 +1,7 @@
-function [movDataRate]=ratecontrol(bandwidth, delay_profile, distance)
-bandwidth
-delay_profile
-distance
+function [overalDataRate, movDataRate]=ratecontrol(bandwidth, delay_profile, distance, ntx, nrx)
+% bandwidth
+% delay_profile
+% distance
 
 %% Inputs
 cfgVHT = wlanVHTConfig;         
@@ -20,8 +20,8 @@ tgacChannel = wlanTGacChannel;
 tgacChannel.DelayProfile = delay_profile; % Delay profile model
 %
 tgacChannel.ChannelBandwidth = cfgVHT.ChannelBandwidth;
-tgacChannel.NumTransmitAntennas = 1;
-tgacChannel.NumReceiveAntennas = 1;
+tgacChannel.NumTransmitAntennas = ntx;
+tgacChannel.NumReceiveAntennas = nrx;
 %
 tgacChannel.TransmitReceiveDistance = distance; % Distance in meters for NLOS
 %
@@ -269,4 +269,5 @@ function plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT)
     title(sprintf('Throughput over the duration of %d packets',windowLength))
     
 end
+    overalDataRate=8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6;
 end
