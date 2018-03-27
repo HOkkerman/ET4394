@@ -1,0 +1,45 @@
+\documentclass[a4paper]{article}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{ET4394 Wireless Networking
+\\Paper Report}
+\author{Group WN2
+\\Hans Okkerman (4290453) and Pradhayini Ramamurthy(4180437)}
+
+\begin{document}
+\pagenumbering{gobble}
+\maketitle
+
+\section{Paper Details}
+This document is a report on the following paper:
+\\ Vikram Iyer , Vamsi Talla , Bryce Kellogg , Shyamnath Gollakota and Joshua R. Smith, \textit{Inter-Technology Backscatter: Towards Internet Connectivity for Implanted Devices}, SIGCOMM ’16, August 22-26, 2016, Florianopolis, Brazil (http://dx.doi.org/10.1145/2934872.2934894).
+
+\section{Paper Summary}
+\subsection{Overview}
+This paper introduces inter-technology backscatter, a new technique that would allow wireless communication across technologies such as Bluetooth, Zigbee and WiFi by backscattering signals received from one (E.g. Bluetooth) to the other (E.g. WiFi). The technique is targeted mainly at enabling communication between medical implants with severe power constraints and commodity devices such as mobile phones and smart watches to receive live sensor updates, but can also find application elsewhere. This has been demonstrated by three prototypes that use Bluetooth as the signal source: an active contact lens system, an implantable brain interface that backscatters WiFi signals, and a card to card communication setup that backscatters RF signals. 
+
+\subsection{Proposed Technique}
+The difficulties that come from backscattering signals from one technology to another mainly come from their different physical layer specifications, e.g. bandwidth, coding and carrier frequency. The researchers attempt to solve this in several steps. First they use Bluetooth's advertisement channels to generate a constant tone suitable for backscattering by transmitting a constant stream of ones or zeros. This tone must be kept long enough to complete a WiFi transmission. Next, the carrier frequency is shifted to the correct channel by changing the complex impedance of the backscatter circuit with four different devices of 3pF, 1pF, open impedance and 2nH. By switching between these values the complex signal $e^{j2 \pi \Delta ft}$ is generated which is multiplied with the incoming Bluetooth tone to shift the carrier frequency. Finally, DBPSK and DQPSK modulation for 802.11b are achieved by multiplying the generated complex signal with the corresponding $I(t)$ and $Q(t)$ components, which can be done using the same impedances as before. 
+
+
+\subsection{Evaluation and Conclusions}
+The efficacy of the proposed technique is evaluated in terms of the signal strengths and the packet error rate (PER). The evaluation environment is mainly focused in the expected usage range of the target (personal area networking applications) and on devices (TI Bluetooth device, Intel Link 5300 Wi-Fi card) that are representative of commodity hardware such as those on mobile phones. The signal measurements validate the creation of a single-tone Bluetooth signal and the backscatter of a WiFi signal that is sufficiently strong; WiFi RSSI of -70 with 4dBm Bluetooth signal at a distance of 1 foot between receiver, transmitter and backscatter device, to decode 2 Mbps 802.11b transmissions, with a PER of 30\%. 
+The three prototypes that are used to demostrate this technique and the measurements performed on them in in-vitro environments reinforce the efficacy of the proposed \textit{interscatter} and its potential use-cases in low-power environments. Potential improvements include an improvement of the PER and throughput.
+
+\section{Assessment}
+The paper is very well laid out. It is clear from the beginning what the research is about and what the design goal is. Difficulties and proposed solutions are clearly separated in bullet points and discussed separately. Every aspect of the design is covered sequentially and comes with the appropriate background. Finally the conclusions are clear and valid based on the achieved results.
+
+\end{document}
