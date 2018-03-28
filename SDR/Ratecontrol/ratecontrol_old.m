@@ -1,4 +1,4 @@
-function [overalDataRate, movDataRate]=ratecontrol(bandwidth, delay_profile, distance, ntx, nrx)
+function [overalDataRate, movDataRate]=ratecontrol_old(bandwidth, delay_profile, distance, ntx, nrx)
 % bandwidth
 % delay_profile
 % distance
@@ -126,7 +126,7 @@ for numPkt = 1:numPackets
     increaseMCS = (mean(y.EstimatedSNR) > snrUp((snrInd==0)+snrInd));
     decreaseMCS = (mean(y.EstimatedSNR) <= snrDown((snrInd==0)+snrInd));
     snrInd = snrInd+increaseMCS-decreaseMCS;
-    cfgVHT.MCS = snrInd-1;
+    cfgVHT.MCS = snrInd-1
 end
 
 

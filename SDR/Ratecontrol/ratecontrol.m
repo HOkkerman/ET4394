@@ -1,4 +1,4 @@
-function [overalDataRate, movDataRate]=ratecontrol(bandwidth, delay_profile, distance, ntx, nrx, rcaAttack_in, rcaRelease_in, threshold_in)
+function [overalDataRate, movDataRate]=ratecontrol(bandwidth, delay_profile, distance, ntx, nrx, rcaAttack_in, rcaRelease_in, threshold_in, histsize)
 % bandwidth
 % delay_profile
 % distance
@@ -121,8 +121,6 @@ for numPkt = 1:numPackets
     end
     
     
-    
-    histsize=10;
     
     if numPkt <= histsize
         % Compare the estimated SNR to the threshold, and adjust the MCS value
@@ -287,6 +285,7 @@ function plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT)
     xlabel('Packet Number')
     ylabel('Mbps')
     title(sprintf('Throughput over the duration of %d packets',windowLength))
+
     
 end
     overalDataRate=8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6;
