@@ -28,7 +28,7 @@ nrx=1;
 
 avg_datarate=zeros(length(bandwidth), length(delay_profile));
 
-for bw=1:length(bandwidth)
+for bw=2:length(bandwidth)
     for dp=1:length(delay_profile)
         bandwidth_in=char(bandwidth(bw));
         delay_profile_in=char(delay_profile(dp));
