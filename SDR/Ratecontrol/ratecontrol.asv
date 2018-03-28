@@ -138,8 +138,8 @@ for numPkt = 1:numPackets
         % Compare the estimated SNR to the threshold, and adjust the MCS value
         % used for the next packet
         MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
-        increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
-        decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
+        increaseMCS = (snrInd+avgdiff > snrUp((snrInd==0)+snrInd));
+        decreaseMCS = (snrInd-avgdiff <= snrDown((snrInd==0)+snrInd));
         snrInd = snrInd+increaseMCS-decreaseMCS;
         cfgVHT.MCS = snrInd-1;
         
