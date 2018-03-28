@@ -1,4 +1,4 @@
-function [overalDataRate, movDataRate]=ratecontrol(bandwidth, delay_profile, distance, ntx, nrx, rcaAttack_in, rcaRelease_in, threshold_in, histsize)
+function [overalDataRate, movDataRate]=ratecontrol_old(bandwidth, delay_profile, distance, ntx, nrx)
 % bandwidth
 % delay_profile
 % distance
@@ -34,9 +34,9 @@ tgacChannel.SampleRate = sr;
 
 
 %% Rate Control Algorithm Parameters
-rcaAttack = rcaAttack_in;  % Control the sensitivity when MCS is increasing
-rcaRelease = rcaRelease_in; % Control the sensitivity when MCS is decreasing
-threshold = threshold_in; 
+rcaAttack = 1;  % Control the sensitivity when MCS is increasing
+rcaRelease = 0; % Control the sensitivity when MCS is decreasing
+threshold = [11 14 19 20 25 28 30 31 35]; 
 snrUp = [threshold inf]+rcaAttack;
 snrDown = [-inf threshold]-rcaRelease;
 snrInd = cfgVHT.MCS; % Store the start MCS value
@@ -119,32 +119,14 @@ for numPkt = 1:numPackets
     else
         [~,ber(numPkt)] = biterr(y.RxPSDU,txPSDU);
     end
-    
-    
-    
-    if numPkt <= histsize
-        % Compare the estimated SNR to the threshold, and adjust the MCS value
-        % used for the next packet
-        MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
-        increaseMCS = (mean(y.EstimatedSNR) > snrUp((snrInd==0)+snrInd));
-        decreaseMCS = (mean(y.EstimatedSNR) <= snrDown((snrInd==0)+snrInd));
-        snrInd = snrInd+increaseMCS-decreaseMCS;
-        cfgVHT.MCS = snrInd-1;
-    else
-        diff_snrMeasured=diff(snrMeasured(numPkt-histsize:numPkt));
-        avgdiff=mean(diff_snrMeasured);
-        % Compare the estimated SNR to the threshold, and adjust the MCS value
-        % used for the next packet
-        MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
-        increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
-        decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
-        snrInd = snrInd+increaseMCS-decreaseMCS;
-        cfgVHT.MCS = snrInd-1;
-        
-    end
-    
 
-  
+    % Compare the estimated SNR to the threshold, and adjust the MCS value
+    % used for the next packet
+    MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
+    increaseMCS = (mean(y.EstimatedSNR) > snrUp((snrInd==0)+snrInd));
+    decreaseMCS = (mean(y.EstimatedSNR) <= snrDown((snrInd==0)+snrInd));
+    snrInd = snrInd+increaseMCS-decreaseMCS;
+    cfgVHT.MCS = snrInd-1
 end
 
 
@@ -163,7 +145,7 @@ rng(s);
 
 
 
-%displayEndOfDemoMessage(mfilename)
+displayEndOfDemoMessage(mfilename)
 
 function Y = processPacket(txWave,snrWalk,tgacChannel,cfgVHT)
     % Pass the transmitted waveform through the channel, perform
@@ -285,7 +267,6 @@ function plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT)
     xlabel('Packet Number')
     ylabel('Mbps')
     title(sprintf('Throughput over the duration of %d packets',windowLength))
-
     
 end
     overalDataRate=8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6;
