@@ -28,8 +28,8 @@ nrx=1;
 
 avg_datarate=zeros(length(bandwidth), length(delay_profile));
 
-for bw=2:2%length(bandwidth)
-    for dp=6:6%length(delay_profile)
+for bw=3:3%length(bandwidth)
+    for dp=4:4%length(delay_profile)
         bandwidth_in=char(bandwidth(bw));
         delay_profile_in=char(delay_profile(dp));
         distance_in=distance;
@@ -38,9 +38,8 @@ for bw=2:2%length(bandwidth)
         threshold=[11 14 19 20 25 28 30 31 35];
         historysize=5;
         
-        [avg, mov] = ratecontrol(bandwidth_in, delay_profile_in, distance_in, ntx, nrx, rcaAttack, rcaRelease, threshold, historysize);
-        %[avg, mov] = ratecontrol_old(bandwidth_in, delay_profile_in, distance_in, ntx, nrx);
-        avg_datarate(bw,dp)=mean(mov);
+        %[avg, mov] = ratecontrol(bandwidth_in, delay_profile_in, distance_in, ntx, nrx, rcaAttack, rcaRelease, threshold, historysize);
+        [avg, mov] = ratecontrol_old(bandwidth_in, delay_profile_in, distance_in, ntx, nrx);
     end
 
 
