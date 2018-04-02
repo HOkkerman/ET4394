@@ -145,8 +145,6 @@ rng(s);
 
 
 
-displayEndOfDemoMessage(mfilename)
-
 function Y = processPacket(txWave,snrWalk,tgacChannel,cfgVHT)
     % Pass the transmitted waveform through the channel, perform
     % receiver processing, and SNR estimation.

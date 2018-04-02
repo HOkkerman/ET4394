@@ -20,9 +20,9 @@ delay_profile=cellstr(delay_profile_i);
 %Distance is the distance between Tx and Rx. Determines if there is a LOS
 %condition based on the chosen delay profile.
 distance=8;
-npackets=1000;
+npackets=500;
 
-historysize=5;
+historysize=6;
 % weights=ones(1,historysize);
 weights=[1,1,2,2,3,5];
 
@@ -37,7 +37,7 @@ for bw=2:2%length(bandwidth)
         delay_profile_in=char(delay_profile(dp));
         distance_in=distance;
        
-        %[avg1, mov1] = ratecontrol_old(npackets, bandwidth_in, delay_profile_in, distance_in);
+%         [avg1, mov1] = ratecontrol_old(npackets, bandwidth_in, delay_profile_in, distance_in);
 %         [avg2, mov2] = ratecontrol(npackets, bandwidth_in, delay_profile_in, distance_in, historysize);
         [avg3, mov3] = ratecontrol_weighted(npackets, bandwidth_in, delay_profile_in, distance_in, weights);    
     end

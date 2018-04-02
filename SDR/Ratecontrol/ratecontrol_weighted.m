@@ -131,14 +131,20 @@ for numPkt = 1:numPackets
         snrInd = snrInd+increaseMCS-decreaseMCS;
         cfgVHT.MCS = snrInd-1;
     else
-        %Generate weighted average:
-        diff_snrMeasured=diff(snrMeasured(numPkt-histsize:numPkt));
+        avg_snrMeasured=mean(snrMeasured(numPkt-histsize:numPkt));
+        
+        %Generate weighted average of change:
+        numPkt
+        diff_snrMeasured=diff(snrMeasured(numPkt-histsize:numPkt))
+        
         avgdiff=sum((diff_snrMeasured.*weights))/sum(weights);
         % Compare the estimated SNR to the threshold, and adjust the MCS value
         % used for the next packet
         MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
         increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
         decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
+%         increaseMCS = (avg_snrMeasured+avgdiff > snrUp((snrInd==0)+snrInd));
+%         decreaseMCS = (avg_snrMeasured+avgdiff <= snrDown((snrInd==0)+snrInd));
         snrInd = snrInd+increaseMCS-decreaseMCS;
         cfgVHT.MCS = snrInd-1;
      
