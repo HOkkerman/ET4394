@@ -142,7 +142,7 @@ for numPkt = 1:numPackets
         avg_snrMeasured=mean(snrMeasured(numPkt-histsize:numPkt));
         
         %Generate weighted average of change:
-        diff_snrMeasured=diff(snrMeasured(numPkt-histsize:numPkt))
+        diff_snrMeasured=diff(snrMeasured(numPkt-histsize:numPkt));
         
         avgdiff=sum((diff_snrMeasured.*weights))/sum(weights);
         
@@ -155,6 +155,8 @@ for numPkt = 1:numPackets
         % used for the next packet
         increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
         decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
+%         increaseMCS = (avg_snrMeasured+avgdiff > snrUp((snrInd==0)+snrInd));
+%         decreaseMCS = (avg_snrMeasured+avgdiff <= snrDown((snrInd==0)+snrInd));
     end
         snrInd = snrInd+increaseMCS-decreaseMCS;
         % Check bounds

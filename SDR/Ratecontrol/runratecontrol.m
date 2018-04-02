@@ -56,6 +56,7 @@ for bw=1:length(bandwidth)
             results_dataRate(resultsCounter, :) = {bw, dp, dist, avg1, avg2, avg3, avg4};
             results_per(resultsCounter, :) = {bw, dp, dist, per1, per2, per3, per4};
         end
+    end
 end
 
 warning('on', 'wlan:shared:PSDULengthInvalidMCSCombination');
