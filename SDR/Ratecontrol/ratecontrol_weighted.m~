@@ -155,7 +155,6 @@ for numPkt = 1:numPackets
         % used for the next packet
         increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
         decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
-    end
         snrInd = snrInd+increaseMCS-decreaseMCS;
         % Check bounds
         if(snrInd > 10)

@@ -165,8 +165,6 @@ overalPer = numel(find(ber))/numPackets;
 % Restore default stream
 rng(s);
 
-
-
 %displayEndOfDemoMessage(mfilename)
 
 function Y = processPacket(txWave,snrWalk,tgacChannel,cfgVHT)

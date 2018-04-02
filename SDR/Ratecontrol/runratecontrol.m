@@ -20,12 +20,13 @@ delay_profile=cellstr(delay_profile_i);
 %Distance is the distance between Tx and Rx. Determines if there is a LOS
 %condition based on the chosen delay profile.
 distance=8;
-npackets=1000;
+npackets=500;
 
 % distance based on bandwidth
 breakpoint_distance = [5; 5; 5; 10; 20; 30];
 
-historysize=5;
+historysize=6;
+
 % weights=ones(1,historysize);
 weights=[1,1,2,2,3,5];
 
@@ -54,8 +55,7 @@ for bw=1:length(bandwidth)
             [avg4, per4] = ratecontrol_BanditLink(npackets, bandwidth_in, delay_profile_in, distance_in);
             results_dataRate(resultsCounter, :) = {bw, dp, dist, avg1, avg2, avg3, avg4};
             results_per(resultsCounter, :) = {bw, dp, dist, per1, per2, per3, per4};
-        end        
-    end
+        end
 end
 
 warning('on', 'wlan:shared:PSDULengthInvalidMCSCombination');

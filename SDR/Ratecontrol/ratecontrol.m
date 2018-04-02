@@ -141,6 +141,8 @@ for numPkt = 1:numPackets
         snrInd = snrInd+increaseMCS-decreaseMCS;
         cfgVHT.MCS = snrInd-1;
     else
+        avg_snrMeasured=mean(snrMeasured(numPkt-histsize:numPkt));
+        
         diff_snrMeasured=diff(snrMeasured(numPkt-histsize:numPkt));
         avgdiff=mean(diff_snrMeasured);
         % Compare the estimated SNR to the threshold, and adjust the MCS value
@@ -154,6 +156,8 @@ for numPkt = 1:numPackets
         
         increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
         decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
+%         increaseMCS = (avg_snrMeasured+avgdiff > snrUp((snrInd==0)+snrInd));
+%         decreaseMCS = (avg_snrMeasured+avgdiff <= snrDown((snrInd==0)+snrInd));
         snrInd = snrInd+increaseMCS-decreaseMCS;
         % Check bounds
         if(snrInd > 10)
