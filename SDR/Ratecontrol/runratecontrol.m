@@ -37,8 +37,8 @@ warning('off', 'wlan:shared:PSDULengthInvalidMCSCombination');
 
 avg_datarate=zeros(length(bandwidth), length(delay_profile));
 resultsCounter = 1;
-results_dataRate = cell(450, 7);
-results_per = cell(450, 7);
+results_dataRate = cell(120, 7);
+results_per = cell(120, 7);
 results_dataRate (1, :) = {'Bandwidth', 'DelayProfile', 'Distance', 'Original', 'MovingAverage', 'WeightedAverage', 'BanditLink'};
 results_per (1, :) = {'Bandwidth', 'DelayProfile', 'Distance', 'Original', 'MovingAverage', 'WeightedAverage', 'BanditLink'};
 for bw=1:length(bandwidth)
