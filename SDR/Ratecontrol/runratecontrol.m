@@ -23,7 +23,7 @@ distance=8;
 npackets=500;
 
 % distance based on bandwidth
-breakpoint_distance = [5; 5; 5; 10; 20; 30];
+breakpoint_distance = [1 2 3 4 5; 1 2 3 4 5; 1 2 3 4 5; 2 4 6 8 10; 4 8 12 16 20; 4 12 18 24 30];
 
 historysize=6;
 
@@ -43,8 +43,8 @@ results_dataRate (1, :) = {'Bandwidth', 'DelayProfile', 'Distance', 'Original', 
 results_per (1, :) = {'Bandwidth', 'DelayProfile', 'Distance', 'Original', 'MovingAverage', 'WeightedAverage', 'BanditLink'};
 for bw=1:length(bandwidth)
     for dp=1:length(delay_profile)
-        for dist = 1:breakpoint_distance(bw)
-            resultsCounter = resultsCounter + 1;
+        for dist = breakpoint_distance(dp, 1:5)
+            resultsCounter = resultsCounter + 1
             bandwidth_in=char(bandwidth(bw));
             delay_profile_in=char(delay_profile(dp));
             distance_in=dist;
@@ -53,8 +53,8 @@ for bw=1:length(bandwidth)
             [avg2, per2] = ratecontrol(npackets, bandwidth_in, delay_profile_in, distance_in, historysize);
             [avg3, per3] = ratecontrol_weighted(npackets, bandwidth_in, delay_profile_in, distance_in, weights);
             [avg4, per4] = ratecontrol_BanditLink(npackets, bandwidth_in, delay_profile_in, distance_in);
-            results_dataRate(resultsCounter, :) = {bw, dp, dist, avg1, avg2, avg3, avg4};
-            results_per(resultsCounter, :) = {bw, dp, dist, per1, per2, per3, per4};
+            results_dataRate(resultsCounter, :) = {bandwidth_in, delay_profile_in, distance_in, avg1, avg2, avg3, avg4};
+            results_per(resultsCounter, :) = {bandwidth_in, delay_profile_in, distance_in, per1, per2, per3, per4};
         end
     end
 end
