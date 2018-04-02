@@ -1,4 +1,4 @@
-function [overalDataRate, movDataRate]=ratecontrol(bandwidth, delay_profile, distance, ntx, nrx, rcaAttack_in, rcaRelease_in, threshold_in, histsize)
+function [overalDataRate, movDataRate]=ratecontrol(npackets, bandwidth, delay_profile, distance, histsize)
 % bandwidth
 % delay_profile
 % distance
@@ -20,8 +20,8 @@ tgacChannel = wlanTGacChannel;
 tgacChannel.DelayProfile = delay_profile; % Delay profile model
 %
 tgacChannel.ChannelBandwidth = cfgVHT.ChannelBandwidth;
-tgacChannel.NumTransmitAntennas = ntx;
-tgacChannel.NumReceiveAntennas = nrx;
+tgacChannel.NumTransmitAntennas = 1;
+tgacChannel.NumReceiveAntennas = 1;
 %
 tgacChannel.TransmitReceiveDistance = distance; % Distance in meters for NLOS
 %
@@ -34,16 +34,16 @@ tgacChannel.SampleRate = sr;
 
 
 %% Rate Control Algorithm Parameters
-rcaAttack = rcaAttack_in;  % Control the sensitivity when MCS is increasing
-rcaRelease = rcaRelease_in; % Control the sensitivity when MCS is decreasing
-threshold = threshold_in; 
+rcaAttack = 1;  % Control the sensitivity when MCS is increasing
+rcaRelease = 0; % Control the sensitivity when MCS is decreasing
+threshold = [11 14 19 20 25 28 30 31 35];
 snrUp = [threshold inf]+rcaAttack;
 snrDown = [-inf threshold]-rcaRelease;
 snrInd = cfgVHT.MCS; % Store the start MCS value
 
 
 %% Simulation Parameters
-numPackets = 100; % Number of packets transmitted during the simulation 
+numPackets = npackets; % Number of packets transmitted during the simulation 
 walkSNR = true; 
 
 % Select SNR for the simulation
