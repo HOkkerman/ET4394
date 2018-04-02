@@ -146,12 +146,6 @@ for numPkt = 1:numPackets
         % Compare the estimated SNR to the threshold, and adjust the MCS value
         % used for the next packet
         MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
-        
-        % Check for invalid packets
-        if(isnan(avgdiff))
-            continue
-        end
-        
         increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
         decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
         snrInd = snrInd+increaseMCS-decreaseMCS;
@@ -163,7 +157,10 @@ for numPkt = 1:numPackets
                 snrInd = 1;
             end
         end
-        
+        [x, y] = size(snrInd);
+        if(x ~= 1)
+            snrInd
+        end
         cfgVHT.MCS = snrInd-1;        
     end
 end

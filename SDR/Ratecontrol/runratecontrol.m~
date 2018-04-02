@@ -52,8 +52,8 @@ for bw=1:length(bandwidth)
             [avg2, per2] = ratecontrol(npackets, bandwidth_in, delay_profile_in, distance_in, historysize);
             [avg3, per3] = ratecontrol_weighted(npackets, bandwidth_in, delay_profile_in, distance_in, weights);
             [avg4, per4] = ratecontrol_BanditLink(npackets, bandwidth_in, delay_profile_in, distance_in);
-            results_dataRate(resultsCounter, :) = {bw, dp, dist, avg1, avg2, avg3, avg4};
-            results_per(resultsCounter, :) = {bw, dp, dist, per1, per2, per3, per4};
+            results_dataRate(resultsCounter, :) = [bw; dp; dist; avg1; avg2; avg3; avg4];
+            results_per(resultsCounter, :) = [bw; dp; dist; per1; per2; per3; per4];
         end        
     end
 end
