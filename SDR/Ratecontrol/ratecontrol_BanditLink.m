@@ -171,6 +171,15 @@ for numPkt = 1:numPackets
         end
     end
     
+    % Check bounds
+    if(MCS(numPkt) > 10)
+        MCS(numPkt) = 10;
+    else 
+        if(MCS(numPkt) < 1)
+            MCS(numPkt) = 1;
+        end
+    end
+    
     % Selection of configuration 'k' from configuration set 'C'
     cfgVHT.MCS = MCS(numPkt) - 1;
     

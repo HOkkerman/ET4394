@@ -41,7 +41,7 @@ results_dataRate = cell(120, 7);
 results_per = cell(120, 7);
 results_dataRate (1, :) = {'Bandwidth', 'DelayProfile', 'Distance', 'Original', 'MovingAverage', 'WeightedAverage', 'BanditLink'};
 results_per (1, :) = {'Bandwidth', 'DelayProfile', 'Distance', 'Original', 'MovingAverage', 'WeightedAverage', 'BanditLink'};
-for bw=1:length(bandwidth)
+for bw=4:length(bandwidth)
     for dp=1:length(delay_profile)
         for dist = breakpoint_distance(dp, 1:5)
             resultsCounter = resultsCounter + 1
@@ -61,8 +61,6 @@ end
 
 warning('on', 'wlan:shared:PSDULengthInvalidMCSCombination');
 
-results_dataRate
-results_per
 % mov = ratecontrol(bandwidth_in, delay_profile_in, distance_in);
 % avg_datarate=mean(mov);
 
