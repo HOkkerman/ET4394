@@ -1,4 +1,4 @@
-function [overalDataRate, overalPer]=ratecontrol_weighted(npackets, bandwidth, delay_profile, distance, weights)
+function [overalDataRate, PER]=ratecontrol_weighted(npackets, bandwidth, delay_profile, distance, weights)
 
 
 %% Inputs
@@ -29,7 +29,7 @@ tgacChannel.RandomStream = 'mt19937ar with seed';
 tgacChannel.Seed = 10;
 
 % Set the sampling rate for the channel
-sr = wlanSampleRate(cfgVHT);
+sr = helperSampleRate(cfgVHT.ChannelBandwidth);
 tgacChannel.SampleRate = sr;
 
 
@@ -86,19 +86,9 @@ for numPkt = 1:numPackets
         snrWalk = 0.9*snrWalk+0.1*baseSNR(numPkt)+rand(1)*maxJump*2-maxJump;
     end
     
-    isValid = 0;
-    while(~isValid)
-        try
-            isValid = 1;
-           % Generate a single packet waveform
-            txPSDU = randi([0,1],8*cfgVHT.PSDULength,1,'int8');
-            txWave = wlanWaveformGenerator(txPSDU,cfgVHT,'IdleTime',5e-4); 
-        catch % unsupported ChannelBandwidth, MCS combination
-            isValid = 0;
-            snrInd = snrInd - 1;
-            cfgVHT.MCS = snrInd-1;            
-        end
-    end
+    % Generate a single packet waveform
+    txPSDU = randi([0,1],8*cfgVHT.PSDULength,1,'int8');
+    txWave = wlanWaveformGenerator(txPSDU,cfgVHT,'IdleTime',5e-4);
     
     % Receive processing, including SNR estimation
     y = processPacket(txWave,snrWalk,tgacChannel,cfgVHT);
@@ -132,42 +122,42 @@ for numPkt = 1:numPackets
     
     
     
-    MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
     if numPkt <= histsize
         % Compare the estimated SNR to the threshold, and adjust the MCS value
         % used for the next packet
+        MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
         increaseMCS = (mean(y.EstimatedSNR) > snrUp((snrInd==0)+snrInd));
         decreaseMCS = (mean(y.EstimatedSNR) <= snrDown((snrInd==0)+snrInd));
+        snrInd = snrInd+increaseMCS-decreaseMCS;
+        cfgVHT.MCS = snrInd-1;
     else
         avg_snrMeasured=mean(snrMeasured(numPkt-histsize:numPkt));
         
         %Generate weighted average of change:
+        %numPkt;
         diff_snrMeasured=diff(snrMeasured(numPkt-histsize:numPkt));
         
         avgdiff=sum((diff_snrMeasured.*weights))/sum(weights);
-        
-        % Check for invalid packets
-        if(isnan(avgdiff))
-            continue
-        end
-        
         % Compare the estimated SNR to the threshold, and adjust the MCS value
         % used for the next packet
-        increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
-        decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
-%         increaseMCS = (avg_snrMeasured+avgdiff > snrUp((snrInd==0)+snrInd));
-%         decreaseMCS = (avg_snrMeasured+avgdiff <= snrDown((snrInd==0)+snrInd));
-    end
+        MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
+        %increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
+        %decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
+        increaseMCS = (avg_snrMeasured+avgdiff > snrUp((snrInd==0)+snrInd));
+        decreaseMCS = (avg_snrMeasured+avgdiff <= snrDown((snrInd==0)+snrInd));
         snrInd = snrInd+increaseMCS-decreaseMCS;
-        % Check bounds
-        if(snrInd > 10)
-            snrInd = 10;
-        else 
-            if(snrInd < 1)
-                snrInd = 1;
+        cfgVHT.MCS = snrInd-1;
+        
+        if cfgVHT.ChannelBandwidth == "CBW20"
+            if cfgVHT.MCS >= 8
+                cfgVHT.MCS = 8;
             end
         end
-        cfgVHT.MCS = snrInd-1;
+     
+    end
+    
+
+  
 end
 
 
@@ -176,12 +166,10 @@ end
 
 
 % Display and plot simulation results
+% disp(['Overall data rate: ' num2str(8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6) ' Mbps']);
 overalDataRate=8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6;
-overalPer = numel(find(ber))/numPackets;
-% disp(['Overall data rate: ' num2str(overalDataRate) ' Mbps']);
-% disp(['Overall packet error rate: ' num2str(overalPer)]);
-% 
-% 
+% disp(['Overall packet error rate: ' num2str(numel(find(ber))/numPackets)]);
+PER=numel(find(ber))/numPackets;
 % plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT);
 
 % Restore default stream
@@ -314,4 +302,5 @@ function plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT)
 
     
 end
+    
 end

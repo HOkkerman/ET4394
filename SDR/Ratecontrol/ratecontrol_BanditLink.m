@@ -1,4 +1,4 @@
-function [overalDataRate, overalPer]=ratecontrol_BanditLink(npackets, bandwidth, delay_profile, distance)
+function [overalDataRate, PER]=ratecontrol_BanditLink(npackets, bandwidth, delay_profile, distance)
 % bandwidth
 % delay_profile
 % distance
@@ -29,7 +29,7 @@ tgacChannel.RandomStream = 'mt19937ar with seed';
 tgacChannel.Seed = 10;
 
 % Set the sampling rate for the channel
-sr = wlanSampleRate(cfgVHT);
+sr = helperSampleRate(cfgVHT.ChannelBandwidth);
 tgacChannel.SampleRate = sr;
 
 %% Simulation Parameters
@@ -138,7 +138,7 @@ for numPkt = 1:numPackets
         e = epsilonCalculator(numPkt);
         v = rand(1,1);        
         if(v <= e)
-            delta = 0.65;
+            %delta = 0.65;
             % x = observed SNR = snrWalk
             snrPlusDelta = snrWalk + delta;
             snrMinDelta = abs(snrWalk - delta);

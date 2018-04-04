@@ -1,4 +1,4 @@
-function [overalDataRate, PER]=ratecontrol(npackets, bandwidth, delay_profile, distance, histsize)
+function [overalDataRate, PER]=ratecontrol_original(npackets, bandwidth, delay_profile, distance)
 % bandwidth
 % delay_profile
 % distance
@@ -36,7 +36,7 @@ tgacChannel.SampleRate = sr;
 %% Rate Control Algorithm Parameters
 rcaAttack = 1;  % Control the sensitivity when MCS is increasing
 rcaRelease = 0; % Control the sensitivity when MCS is decreasing
-threshold = [11 14 19 20 25 28 30 31 35];
+threshold = [11 14 19 20 25 28 30 31 35]; 
 snrUp = [threshold inf]+rcaAttack;
 snrDown = [-inf threshold]-rcaRelease;
 snrInd = cfgVHT.MCS; % Store the start MCS value
@@ -119,42 +119,20 @@ for numPkt = 1:numPackets
     else
         [~,ber(numPkt)] = biterr(y.RxPSDU,txPSDU);
     end
-    
-    
-    
-    if numPkt <= histsize
-        % Compare the estimated SNR to the threshold, and adjust the MCS value
-        % used for the next packet
-        MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
-        increaseMCS = (mean(y.EstimatedSNR) > snrUp((snrInd==0)+snrInd));
-        decreaseMCS = (mean(y.EstimatedSNR) <= snrDown((snrInd==0)+snrInd));
-        snrInd = snrInd+increaseMCS-decreaseMCS;
-        cfgVHT.MCS = snrInd-1;
-    else
-        avg_snrMeasured=mean(snrMeasured(numPkt-histsize:numPkt));
-        
-        diff_snrMeasured=diff(snrMeasured(numPkt-histsize:numPkt));
-        avgdiff=mean(diff_snrMeasured);
-        % Compare the estimated SNR to the threshold, and adjust the MCS value
-        % used for the next packet
-        MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
-        %increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
-        %decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
-        increaseMCS = (avg_snrMeasured+avgdiff > snrUp((snrInd==0)+snrInd));
-        decreaseMCS = (avg_snrMeasured+avgdiff <= snrDown((snrInd==0)+snrInd));
-        snrInd = snrInd+increaseMCS-decreaseMCS;
-        cfgVHT.MCS = snrInd-1;
-        
-        if cfgVHT.ChannelBandwidth == "CBW20"
-            if cfgVHT.MCS >= 8
-                cfgVHT.MCS = 8;
-            end
-        end
-        
-    end
-    
 
-  
+    % Compare the estimated SNR to the threshold, and adjust the MCS value
+    % used for the next packet
+    MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
+    increaseMCS = (mean(y.EstimatedSNR) > snrUp((snrInd==0)+snrInd));
+    decreaseMCS = (mean(y.EstimatedSNR) <= snrDown((snrInd==0)+snrInd));
+    snrInd = snrInd+increaseMCS-decreaseMCS;
+    cfgVHT.MCS = snrInd-1;
+
+    if cfgVHT.ChannelBandwidth == "CBW20"
+        if cfgVHT.MCS >= 8
+            cfgVHT.MCS = 8;
+        end
+    end
 end
 
 
@@ -167,14 +145,13 @@ end
 overalDataRate=8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6;
 % disp(['Overall packet error rate: ' num2str(numel(find(ber))/numPackets)]);
 PER=numel(find(ber))/numPackets;
+
 % plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT);
 
 % Restore default stream
 rng(s);
 
 
-
-%displayEndOfDemoMessage(mfilename)
 
 function Y = processPacket(txWave,snrWalk,tgacChannel,cfgVHT)
     % Pass the transmitted waveform through the channel, perform
@@ -296,8 +273,7 @@ function plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT)
     xlabel('Packet Number')
     ylabel('Mbps')
     title(sprintf('Throughput over the duration of %d packets',windowLength))
-
     
 end
-
+    
 end

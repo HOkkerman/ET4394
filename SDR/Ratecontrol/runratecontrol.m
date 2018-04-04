@@ -6,9 +6,6 @@
 %
 %
 
-%TODO: Put the rate control algorithm in its own separate function to ease
-%editing and changing algorithms
-
 %Bandwidth of channel. Can be CBW20, CBW40, CBW80 or CBW160
 bandwidth_i=['CBW20 '; 'CBW40 '; 'CBW80 '; 'CBW160'];
 bandwidth=cellstr(bandwidth_i);
@@ -19,48 +16,58 @@ delay_profile_i=['Model-A'; 'Model-B'; 'Model-C'; 'Model-D'; 'Model-E'; 'Model-F
 delay_profile=cellstr(delay_profile_i);
 %Distance is the distance between Tx and Rx. Determines if there is a LOS
 %condition based on the chosen delay profile.
-distance=8;
-npackets=500;
+%distance=10;
 
-% distance based on bandwidth
-breakpoint_distance = [1 2 3 4 5; 1 2 3 4 5; 1 2 3 4 5; 2 4 6 8 10; 4 8 12 16 20; 4 12 18 24 30];
-
+npackets=50;
 historysize=6;
-
 % weights=ones(1,historysize);
 weights=[1,1,2,2,3,5];
 
+breakpoint_distance = [5; 5; 5; 10; 20; 30];
 
+%Initialize arrays for results
+%Average throughput
+avg_original=zeros(length(bandwidth), length(delay_profile), 3);
+avg_average=zeros(length(bandwidth), length(delay_profile), 3);
+avg_weighted=zeros(length(bandwidth), length(delay_profile), 3);
+avg_bandit=zeros(length(bandwidth), length(delay_profile), 3);
+%Bit error rate
+PER_original=zeros(length(bandwidth), length(delay_profile), 3);
+PER_average=zeros(length(bandwidth), length(delay_profile), 3);
+PER_weighted=zeros(length(bandwidth), length(delay_profile), 3);
+PER_bandit=zeros(length(bandwidth), length(delay_profile), 3);
 
 % supress warnings
 warning('off', 'wlan:shared:PSDULengthInvalidMCSCombination');
+warning('off', 'wlan:helperSampleRate:Deprecation');
 
-avg_datarate=zeros(length(bandwidth), length(delay_profile));
-resultsCounter = 1;
-results_dataRate = cell(120, 7);
-results_per = cell(120, 7);
-results_dataRate (1, :) = {'Bandwidth', 'DelayProfile', 'Distance', 'Original', 'MovingAverage', 'WeightedAverage', 'BanditLink'};
-results_per (1, :) = {'Bandwidth', 'DelayProfile', 'Distance', 'Original', 'MovingAverage', 'WeightedAverage', 'BanditLink'};
-for bw=4:length(bandwidth)
-    for dp=1:length(delay_profile)
-        for dist = breakpoint_distance(dp, 1:5)
-            resultsCounter = resultsCounter + 1
-            bandwidth_in=char(bandwidth(bw));
-            delay_profile_in=char(delay_profile(dp));
-            distance_in=dist;
+datetime('now')
 
-            [avg1, per1] = ratecontrol_old(npackets, bandwidth_in, delay_profile_in, distance_in);
-            [avg2, per2] = ratecontrol(npackets, bandwidth_in, delay_profile_in, distance_in, historysize);
-            [avg3, per3] = ratecontrol_weighted(npackets, bandwidth_in, delay_profile_in, distance_in, weights);
-            [avg4, per4] = ratecontrol_BanditLink(npackets, bandwidth_in, delay_profile_in, distance_in);
-            results_dataRate(resultsCounter, :) = {bandwidth_in, delay_profile_in, distance_in, avg1, avg2, avg3, avg4};
-            results_per(resultsCounter, :) = {bandwidth_in, delay_profile_in, distance_in, per1, per2, per3, per4};
+tic
+parfor bw=1:4
+    for dp=1:6
+        for d=1:3
+            %Display these values to know what iteration the program is in
+            %Current bandwidth
+            bandwidth_in=char(bandwidth(bw))
+            %Current delay profile
+            delay_profile_in=char(delay_profile(dp))
+            %Current distance. Program goes through breakpoint distance
+            %times 0.5, 1 and 1.5
+            distance_in=d*0.5*breakpoint_distance(dp)
+
+            %Run all 4 models and store results in fuckhueg arrays
+            [avg_original(bw, dp, d), PER_original(bw, dp, d)] = ratecontrol_original(npackets, bandwidth_in, delay_profile_in, distance_in);
+            datetime('now')
+            [avg_average(bw, dp, d), PER_average(bw, dp, d)] = ratecontrol_average(npackets, bandwidth_in, delay_profile_in, distance_in, historysize);
+            datetime('now')
+            [avg_weighted(bw, dp, d), PER_weighted(bw, dp, d)] = ratecontrol_weighted(npackets, bandwidth_in, delay_profile_in, distance_in, weights);  
+            datetime('now')
+            [avg_bandit(bw, dp, d), PER_bandit(bw, dp, d)] = ratecontrol_BanditLink(npackets, bandwidth_in, delay_profile_in, distance_in);
+            datetime('now')
         end
     end
+
+
 end
-
-warning('on', 'wlan:shared:PSDULengthInvalidMCSCombination');
-
-% mov = ratecontrol(bandwidth_in, delay_profile_in, distance_in);
-% avg_datarate=mean(mov);
-
+toc
