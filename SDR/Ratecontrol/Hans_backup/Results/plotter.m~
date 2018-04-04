@@ -1,0 +1,28 @@
+%This script will make graphs of the simulation results
+close all
+load 'Original_avg.mat'
+load 'Average_avg.mat'
+load 'Weighted_avg.mat'
+load 'Bandit_avg.mat'
+
+load 'Original_per.mat'
+load 'Average_per.mat'
+load 'Weighted_per.mat'
+load 'Bandit_per.mat'
+
+model=categorical({'A','B','C','D','E','F'});
+
+for d=1:2
+    figure()
+
+    for bw=1:4
+        avg=[avg_original(bw,:,d);avg_average(bw,:,d);avg_weighted(bw,:,d);avg_bandit(bw,:,d)]';
+        subplot(2,2,bw)
+        fig=bar(model,avg);
+        title('Bandwidth: ' nums2str())
+        xlabel('Delay model:')
+        ylabel('Throughput (MHz):')
+        names={'O', 'A', 'W', 'B'};
+        legend(fig, names)
+    end  
+end
