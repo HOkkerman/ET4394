@@ -1,4 +1,4 @@
-function [overalDataRate, movDataRate]=ratecontrol_old(npackets, bandwidth, delay_profile, distance)
+function [overalDataRate, PER]=ratecontrol_old(npackets, bandwidth, delay_profile, distance)
 % bandwidth
 % delay_profile
 % distance
@@ -127,6 +127,12 @@ for numPkt = 1:numPackets
     decreaseMCS = (mean(y.EstimatedSNR) <= snrDown((snrInd==0)+snrInd));
     snrInd = snrInd+increaseMCS-decreaseMCS;
     cfgVHT.MCS = snrInd-1;
+
+    if cfgVHT.ChannelBandwidth == "CBW20"
+        if cfgVHT.MCS >= 8
+            cfgVHT.MCS = 8;
+        end
+    end
 end
 
 
@@ -135,10 +141,12 @@ end
 
 
 % Display and plot simulation results
-disp(['Overall data rate: ' num2str(8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6) ' Mbps']);
-disp(['Overall packet error rate: ' num2str(numel(find(ber))/numPackets)]);
+% disp(['Overall data rate: ' num2str(8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6) ' Mbps']);
+overalDataRate=8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6;
+% disp(['Overall packet error rate: ' num2str(numel(find(ber))/numPackets)]);
+PER=numel(find(ber))/numPackets;
 
-plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT);
+% plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT);
 
 % Restore default stream
 rng(s);
@@ -267,5 +275,5 @@ function plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT)
     title(sprintf('Throughput over the duration of %d packets',windowLength))
     
 end
-    overalDataRate=8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6;
+    
 end

@@ -21,7 +21,7 @@ delay_profile=cellstr(delay_profile_i);
 %condition based on the chosen delay profile.
 %distance=10;
 
-npackets=50;
+npackets=2000;
 historysize=6;
 % weights=ones(1,historysize);
 weights=[1,1,2,2,3,5];
@@ -46,7 +46,7 @@ warning('off', 'wlan:shared:PSDULengthInvalidMCSCombination');
 datetime('now')
 
 tic
-parfor bw=1:4
+for bw=1:4
     for dp=1:6
         for d=1:3
             %Display these values to know what iteration the program is in
@@ -59,13 +59,7 @@ parfor bw=1:4
             distance_in=d*0.5*breakpoint_distance(dp)
 
             %Run all 4 models and store results in fuckhueg arrays
-            [avg_original(bw, dp, d), PER_original(bw, dp, d)] = ratecontrol_old(npackets, bandwidth_in, delay_profile_in, distance_in);
-            datetime('now')
-            [avg_average(bw, dp, d), PER_average(bw, dp, d)] = ratecontrol(npackets, bandwidth_in, delay_profile_in, distance_in, historysize);
-            datetime('now')
             [avg_weighted(bw, dp, d), PER_weighted(bw, dp, d)] = ratecontrol_weighted(npackets, bandwidth_in, delay_profile_in, distance_in, weights);  
-            datetime('now')
-            [avg_bandit(bw, dp, d), PER_bandit(bw, dp, d)] = ratecontrol_BanditLink(npackets, bandwidth_in, delay_profile_in, distance_in);
             datetime('now')
         end
     end

@@ -1,5 +1,7 @@
-function [overalDataRate, PER]=ratecontrol_weighted(npackets, bandwidth, delay_profile, distance, weights)
-
+function [overalDataRate, overalPer]=ratecontrol_BanditLink(npackets, bandwidth, delay_profile, distance)
+% bandwidth
+% delay_profile
+% distance
 
 %% Inputs
 cfgVHT = wlanVHTConfig;         
@@ -11,8 +13,6 @@ cfgVHT.APEPLength = 4096;          % APEP length in bytes
 
 % Set random stream for repeatability of results
 s = rng(21);
-
-histsize=length(weights);
 
 
 tgacChannel = wlanTGacChannel;
@@ -29,18 +29,8 @@ tgacChannel.RandomStream = 'mt19937ar with seed';
 tgacChannel.Seed = 10;
 
 % Set the sampling rate for the channel
-sr = helperSampleRate(cfgVHT.ChannelBandwidth);
+sr = wlanSampleRate(cfgVHT);
 tgacChannel.SampleRate = sr;
-
-
-%% Rate Control Algorithm Parameters
-rcaAttack = 1;  % Control the sensitivity when MCS is increasing
-rcaRelease = 0; % Control the sensitivity when MCS is decreasing
-threshold = [11 14 19 20 25 28 30 31 35];
-snrUp = [threshold inf]+rcaAttack;
-snrDown = [-inf threshold]-rcaRelease;
-snrInd = cfgVHT.MCS; % Store the start MCS value
-
 
 %% Simulation Parameters
 numPackets = npackets; % Number of packets transmitted during the simulation 
@@ -77,6 +67,61 @@ MCS = zeros(1,numPackets);
 ber = zeros(1,numPackets);
 packetLength = zeros(1,numPackets);
 
+%% BanditLink
+% Multi-Arm Bandit (MAB) Dynamic Link Adaptation Algorithm: The algorithm
+% considers channel bandwidth (cb), guard interval (g), level of frame
+% aggregation (f) and modulation and coding scheme (m) to adjust the data
+% rate, based on the stochastic multi-arm bandit problem using an 
+% epsilon-greedy approach. 
+%
+% This implementation of the algorithm considers a fixed channel bandwidth
+% (given as an input parameter), fixed frame aggregation (given by the
+% constant value of APEPLength) and fixed guard interval (default value). 
+% The tuples in the configuration set are therefore reduced to a single
+% variable, namely the modulation and coding scheme.
+%
+% Given the limited scope of the channel under test (absence of other users
+% or stations, and thereby no collisions, absence of mobility), the MAC
+% layer parameter used is BSR (Bit Success Ratio) in place of FSR (Frame
+% Success Ratio)
+%
+% Number of plays (n) = numPackets
+% t_dur = 1 packet (given the short lenght of the channel
+% t_init = 10% of number of packets, t is measured as packet count instead
+% of time
+
+%% Parameters
+K = 10; % Number of arms (k-arm bandit), with 10 possible MCS values
+
+sumR = zeros(1, K); % sum of rewards for each configuration, used to calculate expected values
+mu = zeros(1, K); % expected values of reward distributions
+T = zeros(1, K); % Number of times each arm has been played by the algorithm during the first n plays
+
+R = zeros(numPackets, 3);
+
+t_init = numPackets / 10; 
+t_dur = 1;
+
+%% Epsilon Greedy Algorithm
+
+% maximum expectation of reward distributions
+function mx = muMax()
+    mx = max(mu);
+end
+
+% difference between the expected rewards of the best arm and the second best arm
+function d = d()
+    d = min(muMax() - mu);
+end
+
+function e = epsilonCalculator(t)
+    c = 1; % constant
+    if(d() <= 0)
+        e = 1;
+    else
+        e = min(1, c*K/((d()^2)*t));
+    end
+end
 
 %% Algorithm stuff
 for numPkt = 1:numPackets 
@@ -86,9 +131,62 @@ for numPkt = 1:numPackets
         snrWalk = 0.9*snrWalk+0.1*baseSNR(numPkt)+rand(1)*maxJump*2-maxJump;
     end
     
-    % Generate a single packet waveform
-    txPSDU = randi([0,1],8*cfgVHT.PSDULength,1,'int8');
-    txWave = wlanWaveformGenerator(txPSDU,cfgVHT,'IdleTime',5e-4);
+    if(numPkt <= K)  % Initial (Cold-start) phase: using t_init as 10% of numPackets
+        MCS(numPkt) = numPkt;
+    else 
+        % Time unit 't' from the algorithm is equated to the packet count here
+        e = epsilonCalculator(numPkt);
+        v = rand(1,1);        
+        if(v <= e)
+            delta = 0.65;
+            % x = observed SNR = snrWalk
+            snrPlusDelta = snrWalk + delta;
+            snrMinDelta = abs(snrWalk - delta);
+            maxReward = 0;
+            maxmu = 0;
+            % check previous transmission
+            if((abs(snrWalk - R(numPkt -1, 1)) <= delta) && (R(numPkt -1, 3) == 1))
+                MCS(numPkt) = MCS(numPkt - 1);
+            else
+                 % check for R with SNR in within range snrWalk +/- maxJump
+                Rchk = find((R(1:numPkt, 1) >= snrMinDelta) & (R(1:numPkt, 1) <= snrPlusDelta));
+                if(~isempty(Rchk))
+                    for i = numel(Rchk) : -1 : 1
+                        % Find MCS closest to SNR, with best expectation
+                        if((maxReward < R(Rchk(i), 3)) || ((maxReward == R(Rchk(i), 3)) && (MCS(numPkt) ~= R(Rchk(i), 2)) && (maxmu < mu(R(Rchk(i), 2)))))
+                            maxReward = R(Rchk(i), 3);
+                            MCS(numPkt) = R(Rchk(i), 2);
+                            maxmu = mu(MCS(numPkt));
+                        end
+                    end
+                end
+                if(maxReward == 0) % Use configuration with overall highest reward
+                    Rbest = find(R(1:numPkt, 3) == max(R(1:numPkt, 3)));
+                    MCS(numPkt) = R(Rbest(numel(Rbest)), 2);
+                end 
+            end            
+                      
+        else % Select uniformly random MCS
+            MCS(numPkt) = randi([1, K],1,1);
+        end
+    end
+    
+    % Selection of configuration 'k' from configuration set 'C'
+    cfgVHT.MCS = MCS(numPkt) - 1;
+    
+    isValid = 0;
+    while(~isValid)
+        try
+            isValid = 1;
+           % Generate a single packet waveform
+            txPSDU = randi([0,1],8*cfgVHT.PSDULength,1,'int8');
+            txWave = wlanWaveformGenerator(txPSDU,cfgVHT,'IdleTime',5e-4); 
+        catch % unsupported ChannelBandwidth, MCS combination
+            isValid = 0;
+            MCS(numPkt) = MCS(numPkt) - 1;
+            cfgVHT.MCS = MCS(numPkt) - 1;            
+        end
+    end
     
     % Receive processing, including SNR estimation
     y = processPacket(txWave,snrWalk,tgacChannel,cfgVHT);
@@ -116,48 +214,20 @@ for numPkt = 1:numPackets
     if isempty(y.RxPSDU)
         % Set the PER of an undetected packet to NaN
         ber(numPkt) = NaN;
+        % Calculate MAC layer parameter BSR (bit success rate)
+        reward = 0;
     else
         [~,ber(numPkt)] = biterr(y.RxPSDU,txPSDU);
+        % Calculate MAC layer parameter BSR (bit success rate)
+        reward = 1 - ber(numPkt);
     end
     
-    
-    
-    if numPkt <= histsize
-        % Compare the estimated SNR to the threshold, and adjust the MCS value
-        % used for the next packet
-        MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
-        increaseMCS = (mean(y.EstimatedSNR) > snrUp((snrInd==0)+snrInd));
-        decreaseMCS = (mean(y.EstimatedSNR) <= snrDown((snrInd==0)+snrInd));
-        snrInd = snrInd+increaseMCS-decreaseMCS;
-        cfgVHT.MCS = snrInd-1;
-    else
-        avg_snrMeasured=mean(snrMeasured(numPkt-histsize:numPkt));
-        
-        %Generate weighted average of change:
-        %numPkt;
-        diff_snrMeasured=diff(snrMeasured(numPkt-histsize:numPkt));
-        
-        avgdiff=sum((diff_snrMeasured.*weights))/sum(weights);
-        % Compare the estimated SNR to the threshold, and adjust the MCS value
-        % used for the next packet
-        MCS(numPkt) = cfgVHT.MCS; % Store current MCS value
-        %increaseMCS = (y.EstimatedSNR+avgdiff > snrUp((snrInd==0)+snrInd));
-        %decreaseMCS = (y.EstimatedSNR+avgdiff <= snrDown((snrInd==0)+snrInd));
-        increaseMCS = (avg_snrMeasured+avgdiff > snrUp((snrInd==0)+snrInd));
-        decreaseMCS = (avg_snrMeasured+avgdiff <= snrDown((snrInd==0)+snrInd));
-        snrInd = snrInd+increaseMCS-decreaseMCS;
-        cfgVHT.MCS = snrInd-1;
-        
-        if cfgVHT.ChannelBandwidth == "CBW20"
-            if cfgVHT.MCS >= 8
-                cfgVHT.MCS = 8;
-            end
-        end
-     
-    end
-    
-
-  
+    % Update BanditLink parameters
+    % Extend reward matrix R = {snr, k, r}, where k is mcs, r is reward
+    R(numPkt, :) = [snrMeasured(1,numPkt), MCS(numPkt), reward];
+    sumR(MCS(numPkt)) = sumR(MCS(numPkt)) + reward; % Update sum of rewards
+    T(MCS(numPkt)) = T(MCS(numPkt)) + 1; % Number of plays of selected 
+    mu(MCS(numPkt)) = sumR(MCS(numPkt)) / T(MCS(numPkt));
 end
 
 
@@ -166,18 +236,17 @@ end
 
 
 % Display and plot simulation results
-% disp(['Overall data rate: ' num2str(8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6) ' Mbps']);
 overalDataRate=8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6;
-% disp(['Overall packet error rate: ' num2str(numel(find(ber))/numPackets)]);
-PER=numel(find(ber))/numPackets;
+overalPer = numel(find(ber))/numPackets;
+% disp(['Overall data rate: ' num2str(overalDataRate) ' Mbps']);
+% disp(['Overall packet error rate: ' num2str(overalPer)]);
+% 
 % plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT);
 
 % Restore default stream
 rng(s);
 
 
-
-%displayEndOfDemoMessage(mfilename)
 
 function Y = processPacket(txWave,snrWalk,tgacChannel,cfgVHT)
     % Pass the transmitted waveform through the channel, perform
@@ -299,8 +368,6 @@ function plotResults(ber,packetLength,snrMeasured,MCS,cfgVHT)
     xlabel('Packet Number')
     ylabel('Mbps')
     title(sprintf('Throughput over the duration of %d packets',windowLength))
-
     
 end
-    
 end
