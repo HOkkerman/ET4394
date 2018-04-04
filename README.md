@@ -29,6 +29,8 @@ Location of important files in this directory:
         SDR/Ratecontrol/
     * Simulation Results:
         SDR/Ratecontrol/results/
+    * Plotter for simulation results:
+        SDR/Ratecontrol/results/plotter.m
 
 #### Usage: MATLAB sources for the Rate Control Assignment:
 * Source files are located in:
