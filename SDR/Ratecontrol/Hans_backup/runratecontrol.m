@@ -21,7 +21,7 @@ delay_profile=cellstr(delay_profile_i);
 %condition based on the chosen delay profile.
 %distance=10;
 
-npackets=50;
+npackets=100;
 historysize=6;
 % weights=ones(1,historysize);
 weights=[1,1,2,2,3,5];
@@ -46,7 +46,7 @@ warning('off', 'wlan:shared:PSDULengthInvalidMCSCombination');
 datetime('now')
 
 tic
-parfor bw=1:4
+for bw=1:4
     for dp=1:6
         for d=1:3
             %Display these values to know what iteration the program is in

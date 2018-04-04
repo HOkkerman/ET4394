@@ -30,6 +30,9 @@ for d=1:2
 end
 
 
+
+
+
 for d=1:2
     figure()
 
@@ -44,3 +47,8 @@ for d=1:2
         legend(fig, names)
     end  
 end
+
+mean_o=mean(avg_original(4,:,2))
+mean_a=mean(avg_average(4,:,2))
+mean_w=mean(avg_weighted(4,:,2))
+mean_b=mean(avg_bandit(4,:,2))
