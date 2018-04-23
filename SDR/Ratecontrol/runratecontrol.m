@@ -62,9 +62,9 @@ for bw=1:4
             distance_in=d*0.5*breakpoint_distance(dp)
 
             %Run all 4 models and store results in arrays. Also print times
-            [avg_original(bw, dp, d), PER_original(bw, dp, d)] = ratecontrol_old(npackets, bandwidth_in, delay_profile_in, distance_in);
+            [avg_original(bw, dp, d), PER_original(bw, dp, d)] = ratecontrol_original(npackets, bandwidth_in, delay_profile_in, distance_in);
             datetime('now')
-            [avg_average(bw, dp, d), PER_average(bw, dp, d)] = ratecontrol(npackets, bandwidth_in, delay_profile_in, distance_in, historysize);
+            [avg_average(bw, dp, d), PER_average(bw, dp, d)] = ratecontrol_average(npackets, bandwidth_in, delay_profile_in, distance_in, historysize);
             datetime('now')
             [avg_weighted(bw, dp, d), PER_weighted(bw, dp, d)] = ratecontrol_weighted(npackets, bandwidth_in, delay_profile_in, distance_in, weights);  
             datetime('now')

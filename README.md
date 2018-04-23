@@ -38,18 +38,18 @@ Location of important files in this directory:
 * To simulate all agorithms for specific combinations of input parameters, run: runratecontrol.m
 * To simulate individual algorithms, run:
     * Original version: 
-        function [overalDataRate, PER]=ratecontrol_original(npackets, bandwidth, delay_profile, distance)
+        [overalDataRate, PER]=ratecontrol_original(npackets, bandwidth, delay_profile, distance)
     * Moving Average version:
-        function [overalDataRate, PER]=ratecontrol_average(npackets, bandwidth, delay_profile, distance, histsize)
+        [overalDataRate, PER]=ratecontrol_average(npackets, bandwidth, delay_profile, distance, histsize)
     * Weighted Average version
-        function [overalDataRate, PER]=ratecontrol_weighted(npackets, bandwidth, delay_profile, distance, weights)
+        [overalDataRate, PER]=ratecontrol_weighted(npackets, bandwidth, delay_profile, distance, weights)
     * BanditLink version
-        function [overalDataRate, PER]=ratecontrol_BanditLink(npackets, bandwidth, delay_profile, distance)
+        [overalDataRate, PER]=ratecontrol_BanditLink(npackets, bandwidth, delay_profile, distance)
     
     where:
     * npackets: Number of packets in simulated signal
     * bandwidth: Channel Bandwidth ['CBW20', 'CBW40', 'CBW80', 'CBW160']
     * delay_profile: Delay Profile model ['Model-A', 'Model-B', 'Model-C', 'Model-D', 'Model-E', 'Model-F']
     * distance: Distance between receiver and transmitter in meters.
-    * histsize: Moving average window size.
-    * weights: Array of weights to be used with moving average window.
+    * histsize: Moving average window size. (recommended: 6)
+    * weights: Array of weights to be used with moving average window. (recommended: [1,1,2,2,3,5])

@@ -138,7 +138,7 @@ for numPkt = 1:numPackets
         e = epsilonCalculator(numPkt);
         v = rand(1,1);        
         if(v <= e)
-            %delta = 0.65;
+            delta = 0.65;
             % x = observed SNR = snrWalk
             snrPlusDelta = snrWalk + delta;
             snrMinDelta = abs(snrWalk - delta);
@@ -246,7 +246,7 @@ end
 
 % Display and plot simulation results
 overalDataRate=8*cfgVHT.APEPLength*(numPackets-numel(find(ber)))/sum(packetLength)/1e6;
-overalPer = numel(find(ber))/numPackets;
+PER = numel(find(ber))/numPackets;
 % disp(['Overall data rate: ' num2str(overalDataRate) ' Mbps']);
 % disp(['Overall packet error rate: ' num2str(overalPer)]);
 % 
